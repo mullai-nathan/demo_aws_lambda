@@ -1,7 +1,7 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
 <channel>
 <title>X-Rite Color Assistant 3.1.0 from AWS (x86)</title>
-<link>https://downloads.xrite.com/downloads/autoupdate/XRiteColorAssistant/Lenovo/XRiteColorAssistant_win_appcast.xml</link>
+<link>https://1dm6dxvo3i.execute-api.us-east-1.amazonaws.com/qa/Downloads/AutoUpdate/XRiteColorAssistant/Lenovo/XRiteColorAssistant_win_appcast.xml</link>
 <description>X-Rite Color Assistant Update Feed</description>
 <language>en</language>
 <pubDate>Mon Mar 1 12:00:00 2021</pubDate>
@@ -10,7 +10,7 @@
 <title>X-Rite Color Assistant(From AWS) 2.56.0</title>
 <sparkle:minimumSystemVersion>5.1</sparkle:minimumSystemVersion>
 <pubDate>Mon Mar 1 12:00:00 2021 +0200</pubDate>
-<enclosure sparkle:version="3.1.0" url="https://downloads.xrite.com/Downloads/Software/XRiteColorAssistant/Lenovo/v2.56.0/XRiteColorAssistantSetup.exe" type="application/octet-stream" sparkle:sha2Has="93c33f0610f6dfdf0b79a1741751fbd13b4e5fffd83417f9f0d9ea4abc182845" length="36133824"/>
+<enclosure sparkle:version="3.1.0" url="https://1dm6dxvo3i.execute-api.us-east-1.amazonaws.com/qa/Downloads/Software/XRiteColorAssistant/Lenovo/v2.56.0/XRiteColorAssistantSetup.exe" type="application/octet-stream" sparkle:sha2Has="93c33f0610f6dfdf0b79a1741751fbd13b4e5fffd83417f9f0d9ea4abc182845" length="36133824"/>
 </item>
 </channel>
 </rss>
