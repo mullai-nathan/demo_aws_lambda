@@ -51,6 +51,10 @@ def handle_text_file(file_data, file_key):
     headers = {"Content-Type": CONTENT_TYPES.get(file_key[-4:], "text/plain")}
     return create_response(200, file_data.decode("utf-8"), headers)
 
+def handle_html_file(file_data, file_key):
+    headers = {"Content-Type": CONTENT_TYPES.get(file_key[-4:], "text/html")}
+    return create_response(200, file_data.decode("utf-8"), headers)
+
 # Handle ZIP & EXE Files (Binary)
 def handle_binary_file(file_data, file_key):
     headers = {
@@ -78,7 +82,7 @@ def lambda_handler(event, context):
             file_key="index.html"
             with open(file_key, "rb") as f:
                 file_data = f.read()
-            return handle_text_file(file_data, file_key)
+            return handle_html_file(file_data, file_key)
 
 
         if not file_key:
