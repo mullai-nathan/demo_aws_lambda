@@ -36,8 +36,8 @@ def lambda_handler(event, context):
         }
     
     # Construct the absolute file path relative to BASE_DIR
-    file_path = os.path.join(BASE_DIR, normalized_path)
-    
+    # file_path = os.path.join(BASE_DIR, normalized_path)
+    file_path = normalized_path
     # Determine content type and headers based on file extension
     if file_path.lower().endswith(".xml"):
         content_type = "text/xml"  # Alternatively, "application/rss+xml"
