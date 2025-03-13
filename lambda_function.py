@@ -1,6 +1,7 @@
 import json
 import base64
 import boto3
+import re
 from botocore.exceptions import ClientError
 
 s3 = boto3.client("s3")
