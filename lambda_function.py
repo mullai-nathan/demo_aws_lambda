@@ -63,7 +63,22 @@ def handle_binary_file(file_data, file_key):
 def lambda_handler(event, context):
     try:
         # Extract file path
-        file_key = event.get("pathParameters", {}).get("proxy", "").lstrip("/")
+        if "pathParameters" in event and event["pathParameters"]:
+            proxy_path = event["pathParameters"].get("proxy")
+
+        path = proxy_path if proxy_path is not None else "/"
+
+        normalized_path = re.sub(r'//+', '/', path)
+        if normalized_path.startswith('/'):
+            normalized_path = normalized_path[1:]
+
+        file_key = normalized_path
+
+        if file_key == "":
+            file_key = "index.html"
+            return handle_text_file(file_data, file_key)
+
+
         if not file_key:
             return create_response(400, json.dumps({"error": "Invalid file request"}))
 
@@ -71,6 +86,7 @@ def lambda_handler(event, context):
         if not re.search(r"\.(xml|html|zip|exe)$", file_key, re.IGNORECASE):
             return create_response(403, json.dumps({"error": "Access denied. Unsupported file type."}))
 
+        
         # Check if file exists in S3
         if not check_file_exists(BUCKET_NAME, file_key):
             return create_response(404, json.dumps({"error": "File not found"}))
