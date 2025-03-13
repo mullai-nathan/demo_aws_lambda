@@ -20,11 +20,8 @@ jobs:
 
       - name: Package Lambda function
         run: |
-          mkdir package
-          cp -r * package/
-          cd package
-          zip -r ../function.zip .
-          cd ..
+          zip -r function.zip . -x "*.git*" "tests/*"
+
 
       - name: Deploy to AWS Lambda
         env:
@@ -32,4 +29,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws lambda update-function-code --function-name your_lambda_function_name --zip-file fileb://function.zip --region $AWS_REGION
+          aws lambda update-function-code --function-name my_python_lambda --zip-file fileb://function.zip --region $AWS_REGION
