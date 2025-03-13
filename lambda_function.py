@@ -75,7 +75,9 @@ def lambda_handler(event, context):
         file_key = normalized_path
 
         if file_key == "":
-            file_key = "index.html"
+            
+            with open(file_key, "rb") as f:
+                file_data = f.read()
             return handle_text_file(file_data, file_key)
 
 
