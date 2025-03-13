@@ -1,0 +1,35 @@
+name: Deploy Python Lambda Function
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.13'  # Specify your Python version
+
+      - name: Package Lambda function
+        run: |
+          mkdir package
+          cp -r * package/
+          cd package
+          zip -r ../function.zip .
+          cd ..
+
+      - name: Deploy to AWS Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws lambda update-function-code --function-name your_lambda_function_name --zip-file fileb://function.zip --region $AWS_REGION
