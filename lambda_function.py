@@ -1,55 +1,53 @@
 import json
 import base64
 import boto3
+from botocore.exceptions import ClientError
 
 s3 = boto3.client("s3")
 
 BUCKET_NAME = "otaupdatebucket"
 
+def check_file_exists(bucket_name, file_key):
+    """Check if a file exists in the S3 bucket."""
+    try:
+        s3.head_object(Bucket=bucket_name, Key=file_key)
+        return True
+    except ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            return False
+        raise e  # Rethrow unexpected errors
+
+def create_response(status_code, message):
+    """Generate a JSON response."""
+    return {
+        "statusCode": status_code,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(message)
+    }
+
 def lambda_handler(event, context):
     try:
-        file_key = event.get("pathParameters", {}).get("proxy", "appcast.xml")
+        proxy_path = None
+        if "pathParameters" in event and event["pathParameters"]:
+            proxy_path = event["pathParameters"].get("proxy")
 
-        print(f"Fetching file: {file_key}")  # Debug log
+        # Use the proxy value if provided; otherwise, default to "/"
+        path = proxy_path if proxy_path is not None else "/"
 
-        if not file_key.endswith((".xml", ".exe")):
-            print("Access Denied - Invalid File Type")  # Debug log
-            return {
-                "statusCode": 403,
-                "body": json.dumps({"error": "Access denied."})
-            }
+        # Normalize the path: collapse multiple slashes and remove any leading slash
+        normalized_path = re.sub(r'//+', '/', path)
+        if normalized_path.startswith('/'):
+            normalized_path = normalized_path[1:]
 
-        # Fetch file from S3
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=file_key)
-        file_data = response["Body"].read()
+        file_key = normalized_path
+        # Check if the file exists in S3
+        if not check_file_exists(BUCKET_NAME, file_key):
+            return create_response(404, {"error": "File not found"})
 
-        # Determine content type
-        content_types = {
-            ".xml": "text/xml",
-            ".exe": "application/octet-stream"
-        }
-        content_type = content_types.get(file_key[-4:], "application/octet-stream")
+        return create_response(200, {"filename": base_filename})
 
-        headers = {"Content-Type": content_type}
-
-        # If it's an EXE, enable Base64 encoding
-        is_base64 = False
-        if file_key.endswith(".exe"):
-            headers["Content-Disposition"] = f"attachment; filename={file_key}"
-            is_base64 = True
-
-        print("File successfully fetched!")  # Debug log
-
-        return {
-            "statusCode": 200,
-            "headers": headers,
-            "isBase64Encoded": is_base64,
-            "file_key": file_key,
-        }
+    except ClientError as e:
+        return create_response(500, {"error": f"S3 Error: {str(e)}"})
 
     except Exception as e:
-        print(f"Error: {str(e)}")  # Debug log
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"error": f"Unexpected error: {str(e)}"})
-        }
+        return create_response(500, {"error": f"Unexpected error: {str(e)}"})
