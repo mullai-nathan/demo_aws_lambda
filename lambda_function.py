@@ -7,7 +7,7 @@ import base64
 BASE_DIR = os.path.join(os.getcwd(), "Downloads")
 
 def lambda_handler(event, context):
-    # Retrieve the "proxy" path parameter from the event (if available)
+    # Retrieve the "proxy" parameter from the event (if available)
     proxy_path = None
     if "pathParameters" in event and event["pathParameters"]:
         proxy_path = event["pathParameters"].get("proxy")
@@ -20,14 +20,14 @@ def lambda_handler(event, context):
     if normalized_path.startswith('/'):
         normalized_path = normalized_path[1:]
     
-    # If no path is provided (empty), default to "index.html"
-    if normalized_path == "":
-        normalized_path = "index.html"
-    
-    # For case-insensitive comparison
+    # Convert the normalized path to lowercase for a case-insensitive lookup
     lower_path = normalized_path.lower()
     
-    # Allow access only if the file is "index.html" or if the path starts with "downloads"
+    # If no path is provided (empty), default to "index.html"
+    if lower_path == "":
+        lower_path = "index.html"
+    
+    # Allow access only if the path is "index.html" or starts with "downloads"
     if lower_path != "index.html" and not lower_path.startswith("downloads"):
         return {
             "statusCode": 403,
@@ -35,12 +35,12 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": "Access denied."})
         }
     
-    # Construct the absolute file path relative to BASE_DIR
-    # file_path = os.path.join(BASE_DIR, normalized_path)
-    file_path = normalized_path
+    # Construct the absolute file path using BASE_DIR and the lower-case path
+    file_path = os.path.join(BASE_DIR, lower_path)
+    
     # Determine content type and headers based on file extension
     if file_path.lower().endswith(".xml"):
-        content_type = "text/xml"  # Alternatively, "application/rss+xml"
+        content_type = "text/xml"  # or "application/rss+xml"
         headers = {"Content-Type": content_type}
     elif file_path.lower().endswith(".exe"):
         content_type = "application/octet-stream"
@@ -62,7 +62,7 @@ def lambda_handler(event, context):
         with open(file_path, "rb") as f:
             file_data = f.read()
         
-        # For XML and HTML files, return as plain text; for EXE, return base64 encoded.
+        # For XML and HTML files, return as plain text; for EXE, return as base64 encoded string.
         if file_path.lower().endswith((".xml", ".html")):
             body = file_data.decode("utf-8")
             is_base64 = False
