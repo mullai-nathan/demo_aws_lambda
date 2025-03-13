@@ -24,6 +24,7 @@ def lambda_handler(event, context):
             "body": "File not found"
         }
     
+    
     # Determine the content type based on the file extension
     if file_path.("appcast.xml"):
         content_type = "application/rss+xml"
