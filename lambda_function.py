@@ -45,7 +45,8 @@ def lambda_handler(event, context):
         if not check_file_exists(BUCKET_NAME, file_key):
             return create_response(404, {"error": "File not found"})
 
-        return create_response(200, {"filename": base_filename})
+
+        return create_response(200, {"filename": file_key})
 
     except ClientError as e:
         return create_response(500, {"error": f"S3 Error: {str(e)}"})
