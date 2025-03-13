@@ -3,8 +3,6 @@ import re
 import json
 import base64
 
-# Base directory for file serving (Downloads folder)
-BASE_DIR = os.path.join(os.getcwd(), "Downloads")
 
 def lambda_handler(event, context):
     # Retrieve the "proxy" parameter from the event (if available)
@@ -36,7 +34,9 @@ def lambda_handler(event, context):
         }
     
     # Construct the absolute file path using BASE_DIR and the lower-case path
-    file_path = os.path.join(BASE_DIR, lower_path)
+    file_path = lower_path
+    file_path = os.path.join(os.getcwd(), file_path)
+
     
     # Determine content type and headers based on file extension
     if file_path.lower().endswith(".xml"):
